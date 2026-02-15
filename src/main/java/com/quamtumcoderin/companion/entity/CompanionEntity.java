@@ -2,6 +2,7 @@ package com.quamtumcoderin.companion.entity;
 
 import com.quamtumcoderin.companion.entity.ai.LumberGoal;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
@@ -10,6 +11,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -93,6 +95,35 @@ public class CompanionEntity extends PathAwareEntity {
             if (!stack.isEmpty()) {
                 this.dropStack(stack);
             }
+        }
+    }
+
+    public ItemStack getAxeStack() {
+        for (int i = 0; i < this.inventory.size(); ++i) {
+            ItemStack stack = this.inventory.getStack(i);
+            if (stack.getItem() instanceof AxeItem) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public boolean hasAxe() {
+        return !getAxeStack().isEmpty();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (!this.world.isClient) {
+            ItemStack bestTool = ItemStack.EMPTY;
+
+            if (hasAxe()) {
+                bestTool = getAxeStack();
+            }
+
+            this.equipStack(EquipmentSlot.MAINHAND, bestTool);
         }
     }
 }
