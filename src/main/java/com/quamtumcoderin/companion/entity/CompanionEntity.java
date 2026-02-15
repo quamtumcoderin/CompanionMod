@@ -3,16 +3,15 @@ package com.quamtumcoderin.companion.entity;
 import com.quamtumcoderin.companion.entity.ai.LumberGoal;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
+import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.AxeItem;
@@ -22,24 +21,26 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class CompanionEntity extends PathAwareEntity {
+public class CompanionEntity extends TameableEntity {
 
     private static final TrackedData<Integer> HUNGER = DataTracker.registerData(CompanionEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     public final SimpleInventory inventory = new SimpleInventory(9);
 
-    public CompanionEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
+    public CompanionEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
     }
 
     public static DefaultAttributeContainer.Builder createCompanionAttributes() {
-        return PathAwareEntity.createMobAttributes()
+        return TameableEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20.0)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 5.0);
@@ -48,9 +49,11 @@ public class CompanionEntity extends PathAwareEntity {
     @Override
     protected void initGoals() {
         this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new LumberGoal(this));
-        this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
-        this.goalSelector.add(3, new WanderAroundFarGoal(this, 1.0));
+        this.goalSelector.add(1, new SitGoal(this));
+        this.goalSelector.add(2, new LumberGoal(this));
+        this.goalSelector.add(3, new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F, false));
+        this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
+        this.goalSelector.add(5, new WanderAroundFarGoal(this, 1.0));
     }
 
     @Override
@@ -64,6 +67,11 @@ public class CompanionEntity extends PathAwareEntity {
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);
+    }
+
+    @Override
+    public @Nullable PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
+        return null;
     }
 
     @Override
