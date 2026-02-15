@@ -23,10 +23,13 @@ public class LumberGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if (this.entity.world.getTime() % 20 == 0) return false;
+        if (!this.entity.hasAxe()) {
+            return false;
+        }
+
+        if (this.entity.world.getTime() % 20 != 0 && treeLogs.isEmpty()) return false;
 
         if (!treeLogs.isEmpty()) return true;
-
         return findTree();
     }
 
@@ -98,19 +101,20 @@ public class LumberGoal extends Goal {
             } else {
                 tickCounter++;
                 if (tickCounter >= 10) {
+                    ItemStack axe = this.entity.getMainHandStack();
+
                     BlockState state = this.entity.world.getBlockState(targetLog);
                     Block block = state.getBlock();
-
                     this.entity.world.breakBlock(targetLog, false);
-
                     ItemStack woodStack = new ItemStack(block);
-
                     ItemStack remainder = this.entity.inventory.addStack(woodStack);
-
                     if (!remainder.isEmpty()) {
                         Block.dropStack(this.entity.world, targetLog, remainder);
                         this.stop();
                     }
+
+                    axe.damage(1, this.entity, (e) -> {
+                    });
 
                     treeLogs.remove(targetLog);
                     targetLog = null;
@@ -122,6 +126,6 @@ public class LumberGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return !treeLogs.isEmpty();
+        return !treeLogs.isEmpty() && this.entity.hasAxe();
     }
 }
