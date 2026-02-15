@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 
@@ -113,8 +114,7 @@ public class LumberGoal extends Goal {
                         this.stop();
                     }
 
-                    axe.damage(1, this.entity, (e) -> {
-                    });
+                    axe.damage(1, this.entity, (e) -> e.playSound(SoundEvents.ENTITY_ITEM_BREAK, 1.0F, 1.0F));
 
                     treeLogs.remove(targetLog);
                     targetLog = null;
