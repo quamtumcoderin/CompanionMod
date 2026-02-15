@@ -1,6 +1,6 @@
 package com.quamtumcoderin.companion.entity;
 
-import com.quamtumcoderin.companion.entity.ai.MiningGoal;
+import com.quamtumcoderin.companion.entity.ai.LumberGoal;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
@@ -27,7 +27,7 @@ public class CompanionEntity extends PathAwareEntity {
     @Override
     protected void initGoals() {
         this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new MiningGoal(this));
+        this.goalSelector.add(1, new LumberGoal(this));
         this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
         this.goalSelector.add(3, new WanderAroundFarGoal(this, 1.0));
     }

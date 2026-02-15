@@ -17,6 +17,9 @@
   "entrypoints": {
     "main": [
       "com.quamtumcoderin.companion.CompanionMod"
+    ],
+    "client": [
+      "com.quamtumcoderin.companion.client.CompanionClient"
     ]
   },
   "mixins": [
