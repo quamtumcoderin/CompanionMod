@@ -24,13 +24,10 @@ public class LumberGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if (!this.entity.hasAxe()) {
-            return false;
-        }
-
+        if (!this.entity.hasAxe()) return false;
         if (this.entity.world.getTime() % 20 != 0 && treeLogs.isEmpty()) return false;
-
         if (!treeLogs.isEmpty()) return true;
+        if (this.entity.getHunger() < 6) return false;
         return findTree();
     }
 
@@ -112,6 +109,10 @@ public class LumberGoal extends Goal {
                     if (!remainder.isEmpty()) {
                         Block.dropStack(this.entity.world, targetLog, remainder);
                         this.stop();
+                    }
+
+                    if (this.entity.getRandom().nextFloat() < 0.2F) {
+                        this.entity.setHunger(this.entity.getHunger() - 1);
                     }
 
                     axe.damage(1, this.entity, (e) -> e.playSound(SoundEvents.ENTITY_ITEM_BREAK, 1.0F, 1.0F));
