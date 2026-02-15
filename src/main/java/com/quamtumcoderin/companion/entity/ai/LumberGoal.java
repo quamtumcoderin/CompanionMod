@@ -1,7 +1,10 @@
 package com.quamtumcoderin.companion.entity.ai;
 
 import com.quamtumcoderin.companion.entity.CompanionEntity;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 
@@ -95,7 +98,20 @@ public class LumberGoal extends Goal {
             } else {
                 tickCounter++;
                 if (tickCounter >= 10) {
-                    this.entity.world.breakBlock(targetLog, true);
+                    BlockState state = this.entity.world.getBlockState(targetLog);
+                    Block block = state.getBlock();
+
+                    this.entity.world.breakBlock(targetLog, false);
+
+                    ItemStack woodStack = new ItemStack(block);
+
+                    ItemStack remainder = this.entity.inventory.addStack(woodStack);
+
+                    if (!remainder.isEmpty()) {
+                        Block.dropStack(this.entity.world, targetLog, remainder);
+                        this.stop();
+                    }
+
                     treeLogs.remove(targetLog);
                     targetLog = null;
                     tickCounter = 0;
